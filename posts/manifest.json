@@ -1,0 +1,17 @@
+[
+    {
+        "filename": "post-3.md",
+        "title": "DevLog #3: ระบบ Custom Shaders และการเรนเดอร์กราฟิก Retro",
+        "date": "2026-10-24"
+    },
+    {
+        "filename": "post-2.md",
+        "title": "DevLog #2: พัฒนา Secondary Motion Physics ด้วย Verlet Integration",
+        "date": "2026-10-15"
+    },
+    {
+        "filename": "post-1.md",
+        "title": "DevLog #1: เริ่มต้นโปรเจกต์และการเซ็ตอัพสถาปัตยกรรมหลัก",
+        "date": "2026-10-01"
+    }
+]
