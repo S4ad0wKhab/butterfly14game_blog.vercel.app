@@ -45,14 +45,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ฟังก์ชันแสดงโพสต์เดี่ยว
 async function renderSinglePostDirectly(filename) {
     const container = document.getElementById('posts-container');
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+    
+    // ซ่อนกล่องปุ่มโหลดเพิ่มเติมทั้งหมดเพื่อไม่ให้มีส่วนเกินโผล่มา
+    const loadMoreContainer = document.querySelector('.load-more-container');
+    if (loadMoreContainer) {
+        loadMoreContainer.style.display = 'none';
+    }
 
     let postTitle = filename;
     let postDate = '';
     
     try {
-        // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
         const res = await fetch('/posts/manifest.json');
         if (res.ok) {
             const manifest = await res.json();
@@ -66,7 +69,6 @@ async function renderSinglePostDirectly(filename) {
         console.warn('Could not load manifest.');
     }
 
-    // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
     const mdResponse = await fetch(`/posts/${filename}`);
     if (!mdResponse.ok) throw new Error(`ไม่พบไฟล์โพสต์: posts/${filename}`);
 
@@ -90,7 +92,6 @@ async function renderSinglePostDirectly(filename) {
 
 // โหลดรายการโพสต์สำหรับหน้าแรก
 async function loadPostManifest() {
-    // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
     const response = await fetch('/posts/manifest.json');
     if (!response.ok) throw new Error('ไม่สามารถโหลดไฟล์ posts/manifest.json ได้');
     
@@ -102,13 +103,12 @@ async function loadPostManifest() {
 
 async function renderPosts() {
     const container = document.getElementById('posts-container');
-    const loadMoreBtn = document.getElementById('load-more-btn');
+    const loadMoreContainer = document.querySelector('.load-more-container');
 
     const nextBatch = allPosts.slice(currentIndex, currentIndex + POSTS_PER_PAGE);
 
     for (const postMeta of nextBatch) {
         try {
-            // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
             const mdResponse = await fetch(`/posts/${postMeta.filename}`);
             if (!mdResponse.ok) continue;
             
@@ -133,8 +133,9 @@ async function renderPosts() {
 
     currentIndex += nextBatch.length;
 
-    if (currentIndex >= allPosts.length && loadMoreBtn) {
-        loadMoreBtn.style.display = 'none';
+    // ซ่อนปุ่มโหลดเพิ่มหากแสดงครบทุกโพสต์แล้ว
+    if (currentIndex >= allPosts.length && loadMoreContainer) {
+        loadMoreContainer.style.display = 'none';
     }
 }
 
