@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search);
         let targetFilename = urlParams.get('post') || urlParams.get('p');
         
-        // ตรวจสอบ Path เช่น /posts/post-1.md อย่างปลอดภัย
+        // ตรวจสอบ Path เช่น /posts/post-1.md
         const pathname = window.location.pathname;
         const pathMatch = pathname.match(/\/posts\/([a-zA-Z0-9_\-]+\.md)$/);
         
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             targetFilename = pathMatch[1];
         }
 
-        // ถ้ามีชื่อไฟล์ระบุมา และไม่ใช่ค่าว่าง ให้โหลดโพสต์เดี่ยว
+        // ถ้ามีชื่อไฟล์ระบุมา ให้โหลดโพสต์เดี่ยว
         if (targetFilename && targetFilename.trim() !== '') {
             await renderSinglePostDirectly(targetFilename);
         } else {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="post-card" style="border-color: #ff6b6b; text-align: center;">
                 <h2 class="post-title" style="color: #ff6b6b;">เกิดข้อผิดพลาด</h2>
                 <p style="color: #ccc; margin-top: 10px;">${err.message}</p>
-                <a href="./" class="btn-load-more" style="text-decoration: none; display: inline-block; margin-top: 15px;">กลับสู่หน้าแรก</a>
+                <a href="/" class="btn-load-more" style="text-decoration: none; display: inline-block; margin-top: 15px;">กลับสู่หน้าแรก</a>
             </div>
         `;
     }
@@ -52,7 +52,8 @@ async function renderSinglePostDirectly(filename) {
     let postDate = '';
     
     try {
-        const res = await fetch('posts/manifest.json');
+        // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
+        const res = await fetch('/posts/manifest.json');
         if (res.ok) {
             const manifest = await res.json();
             const found = manifest.find(p => p.filename === filename);
@@ -65,7 +66,8 @@ async function renderSinglePostDirectly(filename) {
         console.warn('Could not load manifest.');
     }
 
-    const mdResponse = await fetch(`posts/${filename}`);
+    // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
+    const mdResponse = await fetch(`/posts/${filename}`);
     if (!mdResponse.ok) throw new Error(`ไม่พบไฟล์โพสต์: posts/${filename}`);
 
     const markdownText = await mdResponse.text();
@@ -81,14 +83,15 @@ async function renderSinglePostDirectly(filename) {
             <div class="post-content">${cleanHtml}</div>
         </article>
         <div style="text-align: center; margin-top: 2.5rem;">
-            <a href="./" class="btn-load-more" style="text-decoration: none; display: inline-block;">← กลับสู่หน้าแรก</a>
+            <a href="/" class="btn-load-more" style="text-decoration: none; display: inline-block;">← กลับสู่หน้าแรก</a>
         </div>
     `;
 }
 
 // โหลดรายการโพสต์สำหรับหน้าแรก
 async function loadPostManifest() {
-    const response = await fetch('posts/manifest.json');
+    // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
+    const response = await fetch('/posts/manifest.json');
     if (!response.ok) throw new Error('ไม่สามารถโหลดไฟล์ posts/manifest.json ได้');
     
     allPosts = await response.json();
@@ -105,7 +108,8 @@ async function renderPosts() {
 
     for (const postMeta of nextBatch) {
         try {
-            const mdResponse = await fetch(`posts/${postMeta.filename}`);
+            // แก้ไข: ใช้ /posts/ เพื่อชี้ไปที่ root เสมอ
+            const mdResponse = await fetch(`/posts/${postMeta.filename}`);
             if (!mdResponse.ok) continue;
             
             const markdownText = await mdResponse.text();
@@ -118,7 +122,7 @@ async function renderPosts() {
             postArticle.className = 'post-card';
             postArticle.innerHTML = `
                 <div class="post-date">${postMeta.date}</div>
-                <h2 class="post-title"><a href="posts/${postMeta.filename}" style="color: inherit; text-decoration: none;">${postMeta.title}</a></h2>
+                <h2 class="post-title"><a href="/posts/${postMeta.filename}" style="color: inherit; text-decoration: none;">${postMeta.title}</a></h2>
                 <div class="post-content">${cleanHtml}</div>
             `;
             container.appendChild(postArticle);
